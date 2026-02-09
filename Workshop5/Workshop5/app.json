@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Week5",
-    "slug": "Week5",
+    "name": "Workshop5",
+    "slug": "Workshop5",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "week5",
+    "scheme": "workshop5",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

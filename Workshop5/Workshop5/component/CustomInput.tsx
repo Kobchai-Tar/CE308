@@ -1,4 +1,3 @@
-import "./global.css"
 import React from "react";
 import { View, Text, TextInput, TextInputProps } from "react-native";
 

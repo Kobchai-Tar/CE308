@@ -55,11 +55,11 @@ export default function Index() {
 
       case "email":
         if (!value.trim()) {
-          return "กรุณากรอกอีเมลด้วยนะจ้ะ";
+          return "กรุณากรอกอีเมลด้วย";
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(value)) {
-          return "รูปแบบอีเมลไม่ถูกต้องนะจ้ะ";
+          return "รูปแบบอีเมลไม่ถูกต้อง";
         }
         return undefined;
       
