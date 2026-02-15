@@ -97,22 +97,34 @@ export default function Index() {
   };
 
   // function จัดการเมื่อมีการเปลี่ยนแปลงค่าใน Input
-  const handleChange =(name: keyof FormData, value: string) => {
-    setFormData((prev) => ({
+  const handleChange = (name: keyof FormData, value: string) => {
+  setFormData((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+
+  // Validate realtime ถ้า field เคยถูก touch แล้ว
+  if (touched[name]) {
+    const error = validateField(name, value);
+    setErrors((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: error,
     }));
+  }
 
-    // Validate reatime if field ถูก touch แล้ว
-    if (touched[name]) {
-      const error = validateField(name, value);
-      setErrors((prev) => ({
-        ...prev,
-        [name]: error,
-      }));
-    }
-  };
-
+  // ถ้าเปลี่ยน password ต้อง revalidate confirmPassword
+  if (name === "password" && touched.confirmPassword) {
+    const confirmError = validateField(
+      "confirmPassword",
+      formData.confirmPassword
+    );
+    setErrors((prev) => ({
+      ...prev,
+      confirmPassword: confirmError,
+    }));
+  }
+};
+  
   // function จัดการเมื่อ Input ภูก blur (สูญเสียโฟกัส)
   const handleBlur = (name: keyof FormData) => {
     setTouched((prev) => ({
@@ -172,7 +184,7 @@ export default function Index() {
       setIsLoading(false);
       Alert.alert(
         "สำเร็จ!",
-        `ลงทพเบียนสำเร็จ\n\nชื่อ: ${formData.fullName}\nอีเมล:${formData.email}\nเบอร์: ${formData.phone}`,
+        `ลงทะเบียนสำเร็จ\n\nชื่อ: ${formData.fullName}\nอีเมล:${formData.email}\nเบอร์: ${formData.phone}`,
         [
           {
             text: "ตรวจสอบ",
@@ -197,7 +209,7 @@ export default function Index() {
       confirmPassword: "",
     });
     setErrors({});
-    setErrors({});
+    setTouched({});
   };
 
   return (
@@ -209,11 +221,11 @@ export default function Index() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
           className="flex-1 bg-gray-50"
-          contentContainerClassName="pb-8"
+          contentContainerClassName="pb-12"
           keyboardShouldPersistTaps="handled"
           >
             {/* Header */}
-            <View className="bg-blue-600 pt-16 pb-8 px-6">
+            <View className="bg-blue-600 pt-20 pb-10 px-6">
               <Text className="text-white text-3xl font-bold">
                 ลงทะเบียนสมาชิก
               </Text>
@@ -226,7 +238,7 @@ export default function Index() {
             <View className="px-6 mt-6">
               {/* ชื่อ-นามสุกล */}
               <CustomInput
-              label="ชื่อ-นามสุกล"
+              label="ชื่อ-นามสกุล"
               placeholder="ระบุชื่อและนามสกุล"
               value={formData.fullName}
               onChangeText={(value) => handleChange("fullName",value)}
@@ -292,7 +304,7 @@ export default function Index() {
             {/* Button */}
             <View className="mt-4 space-y-3">
               <CustomButton
-                title="ลงเทียน"
+                title="ลงทะเบียน"
                 onPress={handleSubmit}
                 variant="primary"
                 loading={isLoading}
@@ -306,7 +318,7 @@ export default function Index() {
             </View>
 
             {/* Info Box */}
-            <View className="mt-6 bg-blue-50 broder-2 border-blue-200 rounded-lg p-4">
+            <View className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
               <Text className="text-blue-800 font-semibold text-base mb-2">
                 คำแนะนำ
               </Text>
