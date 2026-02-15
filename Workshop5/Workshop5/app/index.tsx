@@ -1,8 +1,9 @@
 import "./global.css";
 import React, { useState } from "react";
-import { View, Text , TextInput , ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableWithoutFeedback, Keyboard, } from "react-native";
+import { View, Text, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableWithoutFeedback, Keyboard, } from "react-native";
 import CustomInput from "../component/CustomInput";
 import CustomButton from "../component/CustomButton";
+import Checkbox from "@/component/Checkbox";
 
 // Interface สำหรับข้อมูล From
 interface FormData {
@@ -44,6 +45,11 @@ export default function Index() {
   const [address, setAddress] = useState("");
 
   const [addressError, setAddressError] = useState("");
+
+  const [accepted, setAccepted] = useState(false);
+
+  const [acceptedError, setAcceptedError] = useState("");
+
 
   //function Validation สำหรับแต่ละ field
   const validateField = (name: string, value: string): string | undefined => {
@@ -148,7 +154,8 @@ export default function Index() {
   const validateForm = (): boolean => {
     const validateForm = () => {
       const isAddressValid = validateAddress();
-      return isAddressValid;
+      const isAcceptedValid = validateAccepted();
+      return isAddressValid && isAcceptedValid;
     };
 
     const newErrors: FormErrors = {};
@@ -229,6 +236,16 @@ export default function Index() {
     setAddressError("");
     return true;
   };
+
+  const validateAccepted = () => {
+    if (!accepted) {
+      setAcceptedError("กรุณายอมรับข้อตกลง");
+      return false;
+    }
+    setAcceptedError("");
+    return true;
+  };
+
 
   return (
     <KeyboardAvoidingView
@@ -359,6 +376,16 @@ export default function Index() {
               />
             </View>
 
+              {/* Checkbox */}
+            <Checkbox
+              checked={accepted}
+              onToggle={() => setAccepted(!accepted)}
+              label="ฉันยอมรับข้อกำหนดและเงื่อนไข"
+            />
+
+            {acceptedError ? (
+              <Text className="text-red-500 mt-1">{acceptedError}</Text>
+            ) : null}
 
 
             {/* Info Box */}
