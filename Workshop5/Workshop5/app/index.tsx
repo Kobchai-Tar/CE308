@@ -162,16 +162,10 @@ export default function Index() {
 
   //function Validate ทั้ง form
   const validateForm = (): boolean => {
-    const validateForm = () => {
-      const isAddressValid = validateAddress();
-      const isAcceptedValid = validateAccepted();
-      return isAddressValid && isAcceptedValid;
-    };
-
     const newErrors: FormErrors = {};
     let isValid = true;
 
-    // ตรวจสอบทุก field
+    // validate formData หลัก
     (Object.keys(formData) as Array<keyof FormData>).forEach((key) => {
       const error = validateField(key, formData[key]);
       if (error) {
@@ -182,7 +176,17 @@ export default function Index() {
 
     setErrors(newErrors);
 
-    //Mark ทุก field ว่าถูก touch แล้ว
+    // validate workshop 4
+    const isAddressValid = validateAddress();
+    const isAcceptedValid = validateAccepted();
+    const isGenderValid = validateGender();
+    const isDobValid = validateDob();
+
+    if (!isAddressValid || !isAcceptedValid || !isGenderValid || !isDobValid) {
+      isValid = false;
+    }
+
+    // mark touched
     const allTouched: { [key: string]: boolean } = {};
     Object.keys(formData).forEach((key) => {
       allTouched[key] = true;
@@ -191,6 +195,7 @@ export default function Index() {
 
     return isValid;
   };
+
 
   const handleSubmit = async () => {
     // ปิด Keyboard
@@ -213,12 +218,8 @@ export default function Index() {
         `ลงทะเบียนสำเร็จ\n\nชื่อ: ${formData.fullName}\nอีเมล:${formData.email}\nเบอร์: ${formData.phone}`,
         [
           {
-            text: "ตรวจสอบ",
-            onPress: () => console.log("Form Data:", formData),
-          },
-          {
-            text: "รีเซ็ตฟอร์ม",
-            onPress: () => console.log("Form Data:", formData),
+            text: "ตกลง",
+            onPress: handleReset,
           },
         ]
       );
@@ -227,6 +228,7 @@ export default function Index() {
 
   //function reset form
   const handleReset = () => {
+    // ล้างค่าฟอร์ม
     setFormData({
       fullName: "",
       email: "",
@@ -234,9 +236,25 @@ export default function Index() {
       password: "",
       confirmPassword: "",
     });
+
+    // ล้าง workshop 4
+    setAddress("");
+    setAccepted(false);
+    setGender("");
+    setDob(null);
+
+    // ล้าง error
     setErrors({});
+    setAddressError("");
+    setAcceptedError("");
+    setGenderError("");
+    setDobError("");
+
+    // ล้าง touched
     setTouched({});
+    setShowPicker(false);
   };
+
 
   const validateAddress = () => {
     if (address.trim().length < 10) {
@@ -286,14 +304,13 @@ export default function Index() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1"
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={{ flex: 1 }}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView
           className="flex-1 bg-gray-50"
-          contentContainerClassName="pb-12"
+          contentContainerStyle={{ paddingBottom: 120 }}
           keyboardShouldPersistTaps="handled"
         >
           {/* Header */}
@@ -393,26 +410,6 @@ export default function Index() {
               ) : null}
             </View>
 
-
-            {/* Button */}
-            <View className="mt-4">
-              <CustomButton
-                title="ลงทะเบียน"
-                onPress={handleSubmit}
-                variant="primary"
-                loading={isLoading}
-              />
-
-              <View className="h-3" />
-
-              <CustomButton
-                title="รีเซ็ตฟอร์ม"
-                onPress={handleReset}
-                variant="secondary"
-                disabled={isLoading}
-              />
-            </View>
-
             {/* Checkbox */}
             <Checkbox
               checked={accepted}
@@ -449,7 +446,7 @@ export default function Index() {
               ) : null}
             </View>
 
-              {/* Birthday */}
+            {/* Birthday */}
             <View className="mb-4">
               <Text className="font-semibold mb-2">วันเกิด</Text>
 
@@ -479,6 +476,25 @@ export default function Index() {
               {dobError ? (
                 <Text className="text-red-500 mt-1">{dobError}</Text>
               ) : null}
+            </View>
+
+            {/* Button */}
+            <View className="mt-4">
+              <CustomButton
+                title="ลงทะเบียน"
+                onPress={handleSubmit}
+                variant="primary"
+                loading={isLoading}
+              />
+
+              <View className="h-3" />
+
+              <CustomButton
+                title="รีเซ็ตฟอร์ม"
+                onPress={handleReset}
+                variant="secondary"
+                disabled={isLoading}
+              />
             </View>
 
             {/* Info Box */}
