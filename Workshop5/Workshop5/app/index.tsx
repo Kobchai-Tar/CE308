@@ -4,6 +4,7 @@ import { View, Text, TextInput, ScrollView, KeyboardAvoidingView, Platform, Aler
 import CustomInput from "../component/CustomInput";
 import CustomButton from "../component/CustomButton";
 import Checkbox from "@/component/Checkbox";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 // Interface สำหรับข้อมูล From
 interface FormData {
@@ -54,7 +55,11 @@ export default function Index() {
 
   const [genderError, setGenderError] = useState("");
 
+  const [dob, setDob] = useState<Date | null>(null);
 
+  const [showPicker, setShowPicker] = useState(false);
+
+  const [dobError, setDobError] = useState("");
 
   //function Validation สำหรับแต่ละ field
   const validateField = (name: string, value: string): string | undefined => {
@@ -261,6 +266,23 @@ export default function Index() {
     return true;
   };
 
+  const validateDob = () => {
+    if (!dob) {
+      setDobError("กรุณาเลือกวันเกิด");
+      return false;
+    }
+
+    const today = new Date();
+    const age = today.getFullYear() - dob.getFullYear();
+
+    if (age < 13) {
+      setDobError("อายุต้องมากกว่า 13 ปี");
+      return false;
+    }
+
+    setDobError("");
+    return true;
+  };
 
   return (
     <KeyboardAvoidingView
@@ -427,6 +449,37 @@ export default function Index() {
               ) : null}
             </View>
 
+              {/* Birthday */}
+            <View className="mb-4">
+              <Text className="font-semibold mb-2">วันเกิด</Text>
+
+              <TouchableOpacity
+                onPress={() => setShowPicker(true)}
+                className="border border-gray-300 rounded-lg p-3"
+              >
+                <Text>
+                  {dob
+                    ? dob.toLocaleDateString("en-GB")
+                    : "เลือกวันเกิด (DD/MM/YYYY)"}
+                </Text>
+              </TouchableOpacity>
+
+              {showPicker && (
+                <DateTimePicker
+                  value={dob || new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={(event, selectedDate) => {
+                    setShowPicker(false);
+                    if (selectedDate) setDob(selectedDate);
+                  }}
+                />
+              )}
+
+              {dobError ? (
+                <Text className="text-red-500 mt-1">{dobError}</Text>
+              ) : null}
+            </View>
 
             {/* Info Box */}
             <View className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
