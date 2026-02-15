@@ -1,6 +1,6 @@
 import "./global.css";
 import React, { useState } from "react";
-import { View, Text, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableWithoutFeedback, Keyboard, } from "react-native";
+import { View, Text, TextInput, ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableWithoutFeedback, Keyboard, TouchableOpacity } from "react-native";
 import CustomInput from "../component/CustomInput";
 import CustomButton from "../component/CustomButton";
 import Checkbox from "@/component/Checkbox";
@@ -49,6 +49,11 @@ export default function Index() {
   const [accepted, setAccepted] = useState(false);
 
   const [acceptedError, setAcceptedError] = useState("");
+
+  const [gender, setGender] = useState("");
+
+  const [genderError, setGenderError] = useState("");
+
 
 
   //function Validation สำหรับแต่ละ field
@@ -247,6 +252,16 @@ export default function Index() {
   };
 
 
+  const validateGender = () => {
+    if (!gender) {
+      setGenderError("กรุณาเลือกเพศ");
+      return false;
+    }
+    setGenderError("");
+    return true;
+  };
+
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -376,7 +391,7 @@ export default function Index() {
               />
             </View>
 
-              {/* Checkbox */}
+            {/* Checkbox */}
             <Checkbox
               checked={accepted}
               onToggle={() => setAccepted(!accepted)}
@@ -386,6 +401,31 @@ export default function Index() {
             {acceptedError ? (
               <Text className="text-red-500 mt-1">{acceptedError}</Text>
             ) : null}
+
+            {/* Gender */}
+            <View className="mb-4">
+              <Text className="font-semibold mb-2">เพศ</Text>
+
+              <View className="flex-row space-x-4">
+                {["ชาย", "หญิง", "ไม่ระบุ"].map((item) => (
+                  <TouchableOpacity
+                    key={item}
+                    onPress={() => setGender(item)}
+                    className="flex-row items-center"
+                  >
+                    <View
+                      className={`w-4 h-4 rounded-full border mr-2 ${gender === item ? "bg-blue-600" : "bg-white"
+                        }`}
+                    />
+                    <Text>{item}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {genderError ? (
+                <Text className="text-red-500 mt-1">{genderError}</Text>
+              ) : null}
+            </View>
 
 
             {/* Info Box */}
