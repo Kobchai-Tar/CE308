@@ -13,7 +13,7 @@ export default function CustomInput({
     touched,
     ...props
 }: CustomInputProps) {
-    const hasError = touched && error;
+    const hasError = !!touched && !!error;
 
     return (
         <View className="w-full mb-4">
@@ -24,15 +24,15 @@ export default function CustomInput({
             </Text>
 
             {/* Input */}
-            <TextInput
-                className={`w-full px-4 py-3 rounded-lg border
-    ${hasError ? "border-red-500" : "border-gray-300"}
-    ${props.editable === false ? "bg-gray-100" : "bg-white"}
-    text-base text-gray-800`}
+   <TextInput
+  className={
+    "w-full px-4 py-3 rounded-lg border bg-white text-base text-gray-800 " +
+    (hasError ? "border-red-500" : "border-gray-300")
+  }
+  placeholderTextColor="#9CA3AF"
+  {...props}
+/>
 
-                placeholderTextColor="#9CA3AF"
-                {...props}
-            />
 
             {/* Error */}
             {hasError && (

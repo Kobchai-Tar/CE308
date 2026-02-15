@@ -1,6 +1,6 @@
 import "./global.css";
 import React, { useState } from "react";
-import { View, Text, ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableWithoutFeedback, Keyboard,} from "react-native";
+import { View, Text , TextInput , ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableWithoutFeedback, Keyboard, } from "react-native";
 import CustomInput from "../component/CustomInput";
 import CustomButton from "../component/CustomButton";
 
@@ -36,13 +36,17 @@ export default function Index() {
   const [errors, setErrors] = useState<FormErrors>({});
 
   //State สำหรับเช็คค่าว่า field ไหนถูก touch แล้ว
-  const [touched, setTouched] = useState<{ [key: string] : boolean }>({});
+  const [touched, setTouched] = useState<{ [key: string]: boolean }>({});
 
   //State สำหรับ loading
   const [isLoading, setIsLoading] = useState(false);
 
+  const [address, setAddress] = useState("");
+
+  const [addressError, setAddressError] = useState("");
+
   //function Validation สำหรับแต่ละ field
-  const validateField = (name: string, value: string) : string | undefined => {
+  const validateField = (name: string, value: string): string | undefined => {
     switch (name) {
       case "fullName":
         if (!value.trim()) {
@@ -62,7 +66,7 @@ export default function Index() {
           return "รูปแบบอีเมลไม่ถูกต้อง";
         }
         return undefined;
-      
+
       case "phone":
         if (!value.trim()) {
           return "กรุณากรอกเบอร์โทรศัพท์";
@@ -77,7 +81,7 @@ export default function Index() {
         if (!value) {
           return "กรุณากรอกรหัสผ่าน";
         }
-        if (value.length < 6 ) {
+        if (value.length < 6) {
           return "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร";
         }
         return undefined;
@@ -98,33 +102,33 @@ export default function Index() {
 
   // function จัดการเมื่อมีการเปลี่ยนแปลงค่าใน Input
   const handleChange = (name: keyof FormData, value: string) => {
-  setFormData((prev) => ({
-    ...prev,
-    [name]: value,
-  }));
-
-  // Validate realtime ถ้า field เคยถูก touch แล้ว
-  if (touched[name]) {
-    const error = validateField(name, value);
-    setErrors((prev) => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: error,
+      [name]: value,
     }));
-  }
 
-  // ถ้าเปลี่ยน password ต้อง revalidate confirmPassword
-  if (name === "password" && touched.confirmPassword) {
-    const confirmError = validateField(
-      "confirmPassword",
-      formData.confirmPassword
-    );
-    setErrors((prev) => ({
-      ...prev,
-      confirmPassword: confirmError,
-    }));
-  }
-};
-  
+    // Validate realtime ถ้า field เคยถูก touch แล้ว
+    if (touched[name]) {
+      const error = validateField(name, value);
+      setErrors((prev) => ({
+        ...prev,
+        [name]: error,
+      }));
+    }
+
+    // ถ้าเปลี่ยน password ต้อง revalidate confirmPassword
+    if (name === "password" && touched.confirmPassword) {
+      const confirmError = validateField(
+        "confirmPassword",
+        formData.confirmPassword
+      );
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: confirmError,
+      }));
+    }
+  };
+
   // function จัดการเมื่อ Input ภูก blur (สูญเสียโฟกัส)
   const handleBlur = (name: keyof FormData) => {
     setTouched((prev) => ({
@@ -142,6 +146,11 @@ export default function Index() {
 
   //function Validate ทั้ง form
   const validateForm = (): boolean => {
+    const validateForm = () => {
+      const isAddressValid = validateAddress();
+      return isAddressValid;
+    };
+
     const newErrors: FormErrors = {};
     let isValid = true;
 
@@ -157,7 +166,7 @@ export default function Index() {
     setErrors(newErrors);
 
     //Mark ทุก field ว่าถูก touch แล้ว
-    const allTouched: { [key: string] : boolean } ={};
+    const allTouched: { [key: string]: boolean } = {};
     Object.keys(formData).forEach((key) => {
       allTouched[key] = true;
     });
@@ -175,7 +184,7 @@ export default function Index() {
       Alert.alert("ข้อมูลไม่ถูกต้อง", "กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง");
       return;
     }
-    
+
     //จำลองการส่งข้อมูล
     setIsLoading(true);
 
@@ -196,7 +205,7 @@ export default function Index() {
           },
         ]
       );
-    },2000);
+    }, 2000);
   };
 
   //function reset form
@@ -212,6 +221,15 @@ export default function Index() {
     setTouched({});
   };
 
+  const validateAddress = () => {
+    if (address.trim().length < 10) {
+      setAddressError("กรุณากรอกที่อยู่อย่างน้อย 10 ตัวอักษร");
+      return false;
+    }
+    setAddressError("");
+    return true;
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -223,25 +241,25 @@ export default function Index() {
           className="flex-1 bg-gray-50"
           contentContainerClassName="pb-12"
           keyboardShouldPersistTaps="handled"
-          >
-            {/* Header */}
-            <View className="bg-blue-600 pt-20 pb-10 px-6">
-              <Text className="text-white text-3xl font-bold">
-                ลงทะเบียนสมาชิก
-              </Text>
-              <Text className="text-blue-100 text-base mt-2">
-                กรุณากรอกข้อมูลให้ครบถ้วน
-              </Text>
-            </View>
+        >
+          {/* Header */}
+          <View className="bg-blue-600 pt-20 pb-10 px-6">
+            <Text className="text-white text-3xl font-bold">
+              ลงทะเบียนสมาชิก
+            </Text>
+            <Text className="text-blue-100 text-base mt-2">
+              กรุณากรอกข้อมูลให้ครบถ้วน
+            </Text>
+          </View>
 
-            {/* Form Container */}
-            <View className="px-6 mt-6">
-              {/* ชื่อ-นามสุกล */}
-              <CustomInput
+          {/* Form Container */}
+          <View className="px-6 mt-6">
+            {/* ชื่อ-นามสุกล */}
+            <CustomInput
               label="ชื่อ-นามสกุล"
               placeholder="ระบุชื่อและนามสกุล"
               value={formData.fullName}
-              onChangeText={(value) => handleChange("fullName",value)}
+              onChangeText={(value) => handleChange("fullName", value)}
               onBlur={() => handleBlur("fullName")}
               error={errors.fullName}
               touched={touched.fullName}
@@ -253,7 +271,7 @@ export default function Index() {
               label="อีเมล"
               placeholder="example@email.com"
               value={formData.email}
-              onChangeText={(value) => handleChange("email",value)}
+              onChangeText={(value) => handleChange("email", value)}
               onBlur={() => handleBlur("email")}
               error={errors.email}
               touched={touched.email}
@@ -267,7 +285,7 @@ export default function Index() {
               label="เบอร์โทรศัพท์"
               placeholder="0812345678"
               value={formData.phone}
-              onChangeText={(value) => handleChange("phone",value)}
+              onChangeText={(value) => handleChange("phone", value)}
               onBlur={() => handleBlur("phone")}
               error={errors.phone}
               touched={touched.phone}
@@ -280,7 +298,7 @@ export default function Index() {
               label="รหัสผ่าน"
               placeholder="อย่างน้อย 6 ตัวอักษร"
               value={formData.password}
-              onChangeText={(value) => handleChange("password",value)}
+              onChangeText={(value) => handleChange("password", value)}
               onBlur={() => handleBlur("password")}
               error={errors.password}
               touched={touched.password}
@@ -293,7 +311,7 @@ export default function Index() {
               label="ยืนยันรหัสผ่าน"
               placeholder="ระบุรหัสผ่านอีกครั้ง"
               value={formData.confirmPassword}
-              onChangeText={(value) => handleChange("confirmPassword",value)}
+              onChangeText={(value) => handleChange("confirmPassword", value)}
               onBlur={() => handleBlur("confirmPassword")}
               error={errors.confirmPassword}
               touched={touched.confirmPassword}
@@ -301,21 +319,47 @@ export default function Index() {
               autoCapitalize="none"
             />
 
+            <View className="mb-4">
+              <Text className="font-semibold mb-2">ที่อยู่</Text>
+
+              <TextInput
+                className="border border-gray-300 rounded-lg p-3 h-[100px]"
+                multiline
+                maxLength={200}
+                value={address}
+                onChangeText={setAddress}
+              />
+
+              <Text className="text-right text-gray-500 mt-1">
+                {address.length}/200
+              </Text>
+
+              {addressError ? (
+                <Text className="text-red-500 mt-1">{addressError}</Text>
+              ) : null}
+            </View>
+
+
             {/* Button */}
-            <View className="mt-4 space-y-3">
+            <View className="mt-4">
               <CustomButton
                 title="ลงทะเบียน"
                 onPress={handleSubmit}
                 variant="primary"
                 loading={isLoading}
-               />
-               <CustomButton
+              />
+
+              <View className="h-3" />
+
+              <CustomButton
                 title="รีเซ็ตฟอร์ม"
                 onPress={handleReset}
                 variant="secondary"
                 disabled={isLoading}
-              /> 
+              />
             </View>
+
+
 
             {/* Info Box */}
             <View className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -328,9 +372,10 @@ export default function Index() {
                 - เบอร์โทรศัพท์ต้องเป็นตัวเลข 10 หลัก{"\n"}
                 - รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร
               </Text>
+
             </View>
-            </View>
-          </ScrollView>
+          </View>
+        </ScrollView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
