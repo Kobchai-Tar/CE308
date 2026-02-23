@@ -1,5 +1,10 @@
-import { Text, View, Button, StyleSheet } from "react-native";
+import { Text, View, Button, StyleSheet, Pressable, ScrollView } from "react-native";
 import { router } from 'expo-router';
+
+const products = [
+  { id: '1', name: 'iPhone 15', price: '32,900'},
+  { id: '2', name: 'iPad Air', price: '23,900'},
+];
 
 export default function HomeScreen() {
   return (
